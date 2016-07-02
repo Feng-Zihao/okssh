@@ -13,6 +13,8 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <memory>
+#include "json.hpp"
 
 
 #define KEY_UP (27 << 16 | 91 << 8 | 65)
@@ -21,6 +23,8 @@
 #define KEY_LEFT (27 << 16 | 91 << 8 | 68)
 #define KEY_ENTER (10)
 
+using namespace std;
+namespace okssh {
 
 void initKeyboard();
 
@@ -29,15 +33,25 @@ void restoreKeyboard();
 int32_t getKeyDown();
 
 class Item {
-private:
-    std::string description;
-    std::string hostname;
-    std::string user;
-    std::string key;
-    std::string cmd;
 public:
+    virtual const string &GetShellCommand() = 0;
 
-    const std::string& GetShellCommand() {
+    virtual const string &getDescription() = 0;
+};
+
+class Window;
+
+class Host : public Item {
+    friend class Window;
+private:
+    string description;
+    string hostname;
+    string user;
+    string key;
+    string cmd;
+
+public:
+    const string &GetShellCommand() {
         if (cmd.empty()) {
             cmd.resize(1024);
             cmd = "ssh -i " + key + " " + user + "@" + hostname;
@@ -45,7 +59,7 @@ public:
         return cmd;
     }
 
-    const std::string& getDescription() {
+    const string &getDescription() {
         return description;
     }
 };
@@ -53,20 +67,24 @@ public:
 
 class Window {
 private:
-    int32_t const itemSize;
-    int32_t currentItemIdx = 0;
+    int32_t curr_item_idx = 0;
+    vector<shared_ptr<Item>> item_refs;
 
-    void RenderNormalItem(std::string str);
-    void RenderSelectedItem(std::string str);
+    void RenderItem(bool selected, string str);
+
     void ResetCursor();
 
 public:
-    Window(int32_t _itemSize);
     void SelectPreviousItem();
+
     void SelectNextItem();
+
+    shared_ptr<Item> GetSelectedItemPtr();
+
     void render();
-    void loadConfig(std::string path);
+
+    void load_config(string path);
 };
 
-
+}
 #endif //OKSSH_OKSSH_H

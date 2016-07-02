@@ -4,7 +4,11 @@
 
 #include "okssh.h"
 
+using json = nlohmann::json;
+
 static struct termios old_tio, new_tio;
+
+namespace okssh {
 
 void initKeyboard() {
     // get the terminal settings for stdin
@@ -35,60 +39,74 @@ int getKeyDown() {
 
 }
 
-Window::Window(int32_t _itemSize) : itemSize(_itemSize) { }
-
-
-void Window::RenderNormalItem(std::string str) {
-    printf("\e[0m%.80s\n", str.c_str());
-}
-
-void Window::RenderSelectedItem(std::string str) {
-    printf("\e[7m%.80s\n", str.c_str());
+void Window::RenderItem(bool selected, string str) {
+    if (selected) {
+        printf("\e[7m%.80s\n", str.data());
+    } else {
+        printf("\e[0m%.80s\n", str.data());
+    }
 }
 
 void Window::ResetCursor() {
-    // Move the cursor up [currentItemIdx] lines and return to the head of line
-    printf("\033[%dA", itemSize);
+    // Move the cursor up [curr_item_idx] lines and return to the head of line
+    printf("\033[%dA", (int) item_refs.size());
 }
 
 
 void Window::SelectPreviousItem() {
-    if (currentItemIdx > 0) {
-        currentItemIdx--;
+    if (curr_item_idx > 0) {
+        curr_item_idx--;
     }
     ResetCursor();
     render();
 }
 
 void Window::SelectNextItem() {
-    currentItemIdx++;
-    if (currentItemIdx == itemSize) {
-        currentItemIdx = itemSize - 1;
+    curr_item_idx++;
+    if (curr_item_idx == item_refs.size()) {
+        curr_item_idx = (int32_t) (item_refs.size() - 1);
     }
     ResetCursor();
     render();
 }
 
+shared_ptr<Item> Window::GetSelectedItemPtr() {
+    return item_refs[curr_item_idx];
+}
+
 void Window::render() {
-    for (int i = 0; i < itemSize; ++i) {
-        if (i == currentItemIdx) {
-            RenderSelectedItem(std::to_string(i) + " ===");
-        } else {
-            RenderNormalItem(std::to_string(i) + " ===");
-        }
+    for (int i = 0; i < item_refs.size(); ++i) {
+        RenderItem(i == curr_item_idx, to_string(i) + " " + item_refs[i]->getDescription());
     }
     printf("\e[0m");
     fflush(stdout);
 }
 
-void Window::loadConfig(std::string path) {
+void Window::load_config(string path) {
     if (!path.empty() && path[0] == '~') {
         path = getenv("HOME") + path.substr(1);
     }
-    std::ifstream inf(path);
-    std::stringstream buffer;
+    ifstream inf(path);
+    stringstream buffer;
     if (inf) {
         buffer << inf.rdbuf();
-        std::cout << buffer.str();
+        inf.close();
     }
+    string text = buffer.str();
+    if (text.empty()) {
+        fprintf(stderr, "can't load config file from %s", path.data());
+        exit(-1);
+    }
+    json json_config = json::parse(text);
+    json json_hosts = json_config["hosts"];
+    for_each(json_hosts.begin(), json_hosts.end(), [this](json &host_config) {
+        shared_ptr<Host> host_sptr = make_shared<Host>();
+        host_sptr->description = host_config["description"];
+        host_sptr->user = host_config["user"];
+        host_sptr->key = host_config["key"];
+        host_sptr->hostname = host_config["hostname"];
+        item_refs.push_back(host_sptr);
+    });
+}
+
 }

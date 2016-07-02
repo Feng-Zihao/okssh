@@ -1,34 +1,30 @@
-#include <cstdio>
-#include <unistd.h>
-#include <termios.h>
-#include <functional>
-#include <iostream>
-#include <cstdint>
-#include <string>
 
-#include "json.hpp"
 #include "okssh.h"
+
+using namespace okssh;
 
 int main() {
     initKeyboard();
     int32_t keycode;
 
-    Window window(3);
+    Window window;
+    window.load_config("~/.okssh/config.json");
+    window.render();
+    do {
+        keycode = getKeyDown();
+        switch (keycode) {
+            case KEY_DOWN:
+                window.SelectNextItem();
+                break;
+            case KEY_UP:
+                window.SelectPreviousItem();
+                break;
+            case KEY_ENTER:
+                system(window.GetSelectedItemPtr()->GetShellCommand().data());
+                return 0;
 
-//    window.render();
-
-    window.loadConfig("~/.okssh/config.json");
-//    do {
-//        keycode = getKeyDown();
-//        switch (keycode) {
-//            case KEY_DOWN:
-//                window.SelectNextItem();
-//                break;
-//            case KEY_UP:
-//                window.SelectPreviousItem();
-//                break;
-//        }
-//    } while (keycode != 'q');
+        }
+    } while (keycode != 'q');
 
     restoreKeyboard();
 
