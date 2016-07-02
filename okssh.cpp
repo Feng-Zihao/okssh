@@ -40,3 +40,50 @@ int getKeyDown() {
     return c;
 
 }
+
+Window::Window(int32_t row) : rowSize(row) { }
+
+
+void Window::RenderNormalRow(std::string str) {
+    printf("\e[0m%.80s\n", str.c_str());
+}
+
+void Window::RenderSelectedRow(std::string str) {
+    printf("\e[7m%.80s\n", str.c_str());
+}
+
+void Window::ResetCursor() {
+    // Move the cursor up [currentRow] lines and return to the head of line
+    printf("\033[%dA", rowSize);
+}
+
+
+void Window::SelectPreviousRow() {
+    if (currentRow > 0) {
+        currentRow--;
+    }
+    ResetCursor();
+    render();
+}
+
+void Window::SelectNextRow() {
+    currentRow++;
+    if (currentRow == rowSize) {
+        currentRow = rowSize - 1;
+    }
+    ResetCursor();
+    render();
+}
+
+void Window::render() {
+    for (int i = 0; i < rowSize; ++i) {
+        if (i == currentRow) {
+            RenderSelectedRow(std::to_string(i) + " ===");
+        } else {
+            RenderNormalRow(std::to_string(i) + " ===");
+        }
+    }
+    printf("\e[0m");
+    fflush(stdout);
+}
+

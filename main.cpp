@@ -4,72 +4,30 @@
 #include <functional>
 #include <iostream>
 #include <cstdint>
+#include <string>
 
+#include "json.hpp"
 #include "okssh.h"
 
 
-class Window {
-private:
-    int32_t const rowSize;
-    int32_t currentRow;
-
-    void renderSingleRow(int32_t n) {
-
-    }
-
-    void clearSingleRow(int32_t n) {
-
-    }
-
-    void moveCursorUp(int32_t n) {
-
-    }
-
-    void moveCursorToBegining() {
-
-    }
-
-
-public:
-    Window(int32_t row) : rowSize(row) { }
-
-    void render() {
-        moveCursorUp(0);
-    }
-
-    void getTerminalWidth() {
-
-    }
-
-};
-
-std::function<void(void)> voidFunc;
-
-
-
-int32_t main() {
-
+int main() {
     initKeyboard();
     int32_t keycode;
+
+    Window window(3);
+
+    window.render();
 
     do {
         keycode = getKeyDown();
         switch (keycode) {
             case KEY_DOWN:
-                printf("DOWN");
+                window.SelectNextRow();
                 break;
             case KEY_UP:
-                printf("UP");
+                window.SelectPreviousRow();
                 break;
-            case KEY_LEFT:
-                printf("LEFT");
-                break;
-            case KEY_RIGNT:
-                printf("RIGHT");
-                break;
-
         }
-        printf("%d\n", keycode);
     } while (keycode != 'q');
 
     restoreKeyboard();
