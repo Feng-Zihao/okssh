@@ -9,26 +9,26 @@
 #include "json.hpp"
 #include "okssh.h"
 
-
 int main() {
     initKeyboard();
     int32_t keycode;
 
     Window window(3);
 
-    window.render();
+//    window.render();
 
-    do {
-        keycode = getKeyDown();
-        switch (keycode) {
-            case KEY_DOWN:
-                window.SelectNextRow();
-                break;
-            case KEY_UP:
-                window.SelectPreviousRow();
-                break;
-        }
-    } while (keycode != 'q');
+    window.loadConfig("~/.okssh/config.json");
+//    do {
+//        keycode = getKeyDown();
+//        switch (keycode) {
+//            case KEY_DOWN:
+//                window.SelectNextItem();
+//                break;
+//            case KEY_UP:
+//                window.SelectPreviousItem();
+//                break;
+//        }
+//    } while (keycode != 'q');
 
     restoreKeyboard();
 

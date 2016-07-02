@@ -10,6 +10,9 @@
 #include <termios.h>
 #include <functional>
 #include <iostream>
+#include <vector>
+#include <fstream>
+#include <sstream>
 
 
 #define KEY_UP (27 << 16 | 91 << 8 | 65)
@@ -25,22 +28,44 @@ void restoreKeyboard();
 
 int32_t getKeyDown();
 
+class Item {
+private:
+    std::string description;
+    std::string hostname;
+    std::string user;
+    std::string key;
+    std::string cmd;
+public:
+
+    const std::string& GetShellCommand() {
+        if (cmd.empty()) {
+            cmd.resize(1024);
+            cmd = "ssh -i " + key + " " + user + "@" + hostname;
+        }
+        return cmd;
+    }
+
+    const std::string& getDescription() {
+        return description;
+    }
+};
 
 
 class Window {
 private:
-    int32_t const rowSize;
-    int32_t currentRow = 1;
+    int32_t const itemSize;
+    int32_t currentItemIdx = 0;
 
-    void RenderNormalRow(std::string str);
-    void RenderSelectedRow(std::string str);
+    void RenderNormalItem(std::string str);
+    void RenderSelectedItem(std::string str);
     void ResetCursor();
 
 public:
-    Window(int32_t row);
-    void SelectPreviousRow();
-    void SelectNextRow();
+    Window(int32_t _itemSize);
+    void SelectPreviousItem();
+    void SelectNextItem();
     void render();
+    void loadConfig(std::string path);
 };
 
 
