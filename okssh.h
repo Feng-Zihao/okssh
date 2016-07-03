@@ -14,7 +14,8 @@
 #include <fstream>
 #include <sstream>
 #include <memory>
-#include "json.hpp"
+#include "pugiconfig.hpp"
+#include "pugixml.hpp"
 
 
 #define KEY_UP (27 << 16 | 91 << 8 | 65)
@@ -45,23 +46,15 @@ class Host : public Item {
     friend class Window;
 private:
     string description;
-    string hostname;
-    string user;
-    string key;
+    string target;
+    string keyfile;
     string cmd;
+    string port;
 
 public:
-    const string &GetShellCommand() {
-        if (cmd.empty()) {
-            cmd.resize(1024);
-            cmd = "ssh -i " + key + " " + user + "@" + hostname;
-        }
-        return cmd;
-    }
+    const string &GetShellCommand();
 
-    const string &getDescription() {
-        return description;
-    }
+    const string &getDescription();
 };
 
 

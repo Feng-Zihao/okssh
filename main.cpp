@@ -8,7 +8,7 @@ int main() {
     int32_t keycode;
 
     Window window;
-    window.load_config("~/.okssh/config.json");
+    window.load_config("~/.okssh/config.xml");
     window.render();
     do {
         keycode = getKeyDown();
@@ -20,9 +20,9 @@ int main() {
                 window.SelectPreviousItem();
                 break;
             case KEY_ENTER:
+                cout << window.GetSelectedItemPtr()->GetShellCommand().data() << endl;
                 system(window.GetSelectedItemPtr()->GetShellCommand().data());
                 return 0;
-
         }
     } while (keycode != 'q');
 

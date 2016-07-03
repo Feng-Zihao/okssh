@@ -4,8 +4,6 @@
 
 #include "okssh.h"
 
-using json = nlohmann::json;
-
 static struct termios old_tio, new_tio;
 
 namespace okssh {
@@ -86,27 +84,41 @@ void Window::load_config(string path) {
     if (!path.empty() && path[0] == '~') {
         path = getenv("HOME") + path.substr(1);
     }
-    ifstream inf(path);
-    stringstream buffer;
-    if (inf) {
-        buffer << inf.rdbuf();
-        inf.close();
-    }
-    string text = buffer.str();
-    if (text.empty()) {
-        fprintf(stderr, "can't load config file from %s", path.data());
+
+    pugi::xml_document doc;
+
+    pugi::xml_parse_result result = doc.load_file(path.data());
+    if (!result) {
+        cerr << "Cant' load config " << path;
         exit(-1);
     }
-    json json_config = json::parse(text);
-    json json_hosts = json_config["hosts"];
-    for_each(json_hosts.begin(), json_hosts.end(), [this](json &host_config) {
+    pugi::xml_node hosts_node = doc.child("config").child("hosts");
+
+    for (pugi::xml_node host = hosts_node.child("host"); host; host = host.next_sibling()) {
         shared_ptr<Host> host_sptr = make_shared<Host>();
-        host_sptr->description = host_config["description"];
-        host_sptr->user = host_config["user"];
-        host_sptr->key = host_config["key"];
-        host_sptr->hostname = host_config["hostname"];
+        host_sptr->description = host.child_value("description");
+        host_sptr->keyfile = host.child_value("keyfile");
+        host_sptr->target = host.child_value("target");
+        host_sptr->port = host.child_value("port");
         item_refs.push_back(host_sptr);
-    });
+    }
+
+}
+
+
+const string &Host::GetShellCommand() {
+    if (cmd.empty()) {
+        cmd.resize(1024);
+        cmd = "ssh -i " + keyfile + " " + target;
+    }
+    if (!port.empty()) {
+        cmd += " -p " + port;
+    }
+    return cmd;
+}
+
+const string &Host::getDescription() {
+    return description;
 }
 
 }
