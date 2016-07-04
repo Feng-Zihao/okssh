@@ -60,7 +60,7 @@ public:
 
 class Window {
 private:
-    int32_t curr_item_idx = 0;
+    int32_t curr_item_idx;
     vector<shared_ptr<Item>> item_refs;
 
     void RenderItem(bool selected, string str);
@@ -72,11 +72,14 @@ public:
 
     void SelectNextItem();
 
+    void SelectNone();
+
     shared_ptr<Item> GetSelectedItemPtr();
 
     void render();
 
     void load_config(string path);
+
 };
 
 }

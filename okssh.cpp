@@ -6,6 +6,20 @@
 
 static struct termios old_tio, new_tio;
 
+const string CONFIG_TEMPLATE = R"B246A588(
+<config>
+    <hosts>
+        <host>
+            <description>example config in ~/okssh/config.xml</description> <!-- literal text for -->
+            <keyfile>/whatever/my/keyfile</keyfile> <!-- absolute path for keyfile -->
+            <target>root@111.11.11.11</target> <!-- user@host or just host if login as current user -->
+            <port>11111</port>  <!-- 22 by default if not present -->
+        </host>
+        <!-- append more <host></host> as you need -->
+    </hosts>
+</config>
+)B246A588";
+
 namespace okssh {
 
 void initKeyboard() {
@@ -68,6 +82,12 @@ void Window::SelectNextItem() {
     render();
 }
 
+void Window::SelectNone() {
+    curr_item_idx = -1;
+    ResetCursor();
+    render();
+}
+
 shared_ptr<Item> Window::GetSelectedItemPtr() {
     return item_refs[curr_item_idx];
 }
@@ -81,16 +101,32 @@ void Window::render() {
 }
 
 void Window::load_config(string path) {
+    const static string DEFAULT_CONFIG_PATH = "~/.okssh/config.xml";
+    bool is_default_config_path = DEFAULT_CONFIG_PATH == path;
+
     if (!path.empty() && path[0] == '~') {
         path = getenv("HOME") + path.substr(1);
     }
+
+    ifstream inf(path);
+    if (!inf && is_default_config_path) {
+        cerr << "Can't find config.xml from " + DEFAULT_CONFIG_PATH << endl;
+        cerr << "Generate " << DEFAULT_CONFIG_PATH << " with default template" << endl;
+        ofstream ouf(path);
+        if (ouf) {
+            ouf << CONFIG_TEMPLATE << endl;
+            ouf.close();
+            exit(EXIT_FAILURE);
+        }
+    }
+
 
     pugi::xml_document doc;
 
     pugi::xml_parse_result result = doc.load_file(path.data());
     if (!result) {
-        cerr << "Cant' load config " << path;
-        exit(-1);
+        cerr << "Cant' load config " << path << endl;
+        exit(EXIT_FAILURE);
     }
     pugi::xml_node hosts_node = doc.child("config").child("hosts");
 
@@ -103,8 +139,14 @@ void Window::load_config(string path) {
         item_refs.push_back(host_sptr);
     }
 
-}
+    if (item_refs.empty()) {
+        cerr << "Empty hosts. Exit." << endl;
+        exit(EXIT_FAILURE);
+    }
 
+    curr_item_idx = 0;
+
+}
 
 const string &Host::GetShellCommand() {
     if (cmd.empty()) {
@@ -120,5 +162,6 @@ const string &Host::GetShellCommand() {
 const string &Host::getDescription() {
     return description;
 }
+
 
 }

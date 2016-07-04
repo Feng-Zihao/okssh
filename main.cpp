@@ -1,15 +1,28 @@
 
+#include <csignal>
 #include "okssh.h"
 
 using namespace okssh;
+
+static Window window;
+
+void cleanup(int sig) {
+    window.SelectNone();
+    restoreKeyboard();
+    exit(EXIT_FAILURE);
+}
 
 int main() {
     initKeyboard();
     int32_t keycode;
 
-    Window window;
+
     window.load_config("~/.okssh/config.xml");
     window.render();
+
+    signal (SIGINT, cleanup);
+
+
     do {
         keycode = getKeyDown();
         switch (keycode) {
@@ -26,6 +39,7 @@ int main() {
         }
     } while (keycode != 'q');
 
+    window.SelectNone();
     restoreKeyboard();
 
 
