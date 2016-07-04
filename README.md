@@ -3,6 +3,10 @@ okssh
 
 console GUI tool to manage ssh
 
+Gif record
+---
+![screenrecord](https://raw.githubusercontent.com/Feng-Zihao/okssh/master/screenrecord.gif)
+
 
 Useful Link to implement
 ---
