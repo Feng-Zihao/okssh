@@ -31,7 +31,7 @@ Similar with `~/.ssh/config`, but more structural robust.
 </config>
 ```
 
-This is designed for later extension such as `executing some command after logged in`.
+This is designed for later extension such as `executing some command right after logged in`, `using a keyfile by a HTTP URL`.
 
 
 Useful Link to implement
