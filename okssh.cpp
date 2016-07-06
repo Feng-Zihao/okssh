@@ -3,21 +3,17 @@
 //
 
 #include "okssh.h"
+#include <yaml-cpp/yaml.h>
 
 static struct termios old_tio, new_tio;
 
 const string CONFIG_TEMPLATE = R"B246A588(
-<config>
-    <hosts>
-        <host>
-            <description>example config in ~/okssh/config.xml</description> <!-- literal text for -->
-            <keyfile>/whatever/my/keyfile</keyfile> <!-- absolute path for keyfile -->
-            <target>root@111.11.11.11</target> <!-- user@host or just host if login as current user -->
-            <port>11111</port>  <!-- 22 by default if not present -->
-        </host>
-        <!-- append more <host></host> as you need -->
-    </hosts>
-</config>
+hosts:
+    -
+        description: example description
+        keyfile: /absolute/path/for/keyfile
+        target: user@hostname
+
 )B246A588";
 
 namespace okssh {
@@ -101,7 +97,7 @@ void Window::render() {
 }
 
 void Window::load_config(string path) {
-    const static string DEFAULT_CONFIG_PATH = "~/.okssh/config.xml";
+    const static string DEFAULT_CONFIG_PATH = "~/.okssh/config.yaml";
     bool is_default_config_path = DEFAULT_CONFIG_PATH == path;
 
     if (!path.empty() && path[0] == '~') {
@@ -110,7 +106,7 @@ void Window::load_config(string path) {
 
     ifstream inf(path);
     if (!inf && is_default_config_path) {
-        cerr << "Can't find config.xml from " + DEFAULT_CONFIG_PATH << endl;
+        cerr << "Can't find config.yaml from " + DEFAULT_CONFIG_PATH << endl;
         cerr << "Generate " << DEFAULT_CONFIG_PATH << " with default template" << endl;
         ofstream ouf(path);
         if (ouf) {
@@ -120,22 +116,17 @@ void Window::load_config(string path) {
         }
     }
 
+    YAML::Node config = YAML::LoadFile(path);
 
-    pugi::xml_document doc;
 
-    pugi::xml_parse_result result = doc.load_file(path.data());
-    if (!result) {
-        cerr << "Cant' load config " << path << endl;
-        exit(EXIT_FAILURE);
-    }
-    pugi::xml_node hosts_node = doc.child("config").child("hosts");
+    YAML::Node hosts = config["hosts"];
 
-    for (pugi::xml_node host = hosts_node.child("host"); host; host = host.next_sibling()) {
+    for (YAML::const_iterator host = hosts.begin(); host != hosts.end(); host++) {
         shared_ptr<Host> host_sptr = make_shared<Host>();
-        host_sptr->description = host.child_value("description");
-        host_sptr->keyfile = host.child_value("keyfile");
-        host_sptr->target = host.child_value("target");
-        host_sptr->port = host.child_value("port");
+        host_sptr->description = (*host)["description"].as<string>();
+        host_sptr->keyfile = (*host)["keyfile"].as<string>();
+        host_sptr->target = (*host)["target"].as<string>();
+        host_sptr->port = (*host)["port"].as<string>();
         item_refs.push_back(host_sptr);
     }
 

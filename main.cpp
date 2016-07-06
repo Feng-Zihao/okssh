@@ -1,6 +1,7 @@
 
 #include <csignal>
 #include "okssh.h"
+#include <yaml-cpp/yaml.h>
 
 using namespace okssh;
 
@@ -17,7 +18,7 @@ int main() {
     int32_t keycode;
 
 
-    window.load_config("~/.okssh/config.xml");
+    window.load_config("~/.okssh/config.yaml");
     window.render();
 
     signal (SIGINT, cleanup);

@@ -14,8 +14,6 @@
 #include <fstream>
 #include <sstream>
 #include <memory>
-#include "pugiconfig.hpp"
-#include "pugixml.hpp"
 
 
 #define KEY_UP (27 << 16 | 91 << 8 | 65)
