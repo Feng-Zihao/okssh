@@ -13,7 +13,11 @@ hosts:
         description: example description
         keyfile: /absolute/path/for/keyfile
         target: user@hostname
-
+    -
+        description: example description with port
+        keyfile: /absolute/path/for/keyfile
+        target: user@hostname
+        port: 2222
 )B246A588";
 
 namespace okssh {
@@ -121,12 +125,15 @@ void Window::load_config(string path) {
 
     YAML::Node hosts = config["hosts"];
 
-    for (YAML::const_iterator host = hosts.begin(); host != hosts.end(); host++) {
+    for (YAML::iterator host = hosts.begin(); host != hosts.end(); host++) {
         shared_ptr<Host> host_sptr = make_shared<Host>();
+        host_sptr->description = "abc";
         host_sptr->description = (*host)["description"].as<string>();
         host_sptr->keyfile = (*host)["keyfile"].as<string>();
         host_sptr->target = (*host)["target"].as<string>();
-        host_sptr->port = (*host)["port"].as<string>();
+        if ((*host)["port"]) {
+            host_sptr->port = (*host)["port"].as<string>();
+        }
         item_refs.push_back(host_sptr);
     }
 
