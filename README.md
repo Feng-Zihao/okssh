@@ -9,7 +9,7 @@ Gif record
 
 Usage
 ---
-`oksssh` and you'll find out how.
+`okssh` and you'll find out how.
 
 config.xml
 ---
