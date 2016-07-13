@@ -7,8 +7,10 @@ Gif record
 ---
 ![screenrecord](https://raw.githubusercontent.com/Feng-Zihao/okssh/master/screenrecord.gif)
 
-INSTALL
+INSTALL 
 ---
+>Support Mac OS X only , need [**homebrew**](http://brew.sh/)
+
 #### via curl
 
 ``
@@ -52,3 +54,5 @@ Useful Link to implement
 [cursor movement](http://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/x361.html)
 
 [colors and flags in terminal](http://askubuntu.com/questions/558280/changing-colour-of-text-and-background-of-terminal)
+
+
