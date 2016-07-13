@@ -3,16 +3,15 @@
 # PLEASE REMOVE ALL GENERATED COMMENTS BEFORE SUBMITTING YOUR PULL REQUEST!
 
 class Okssh < Formula
-  desc "A CLI tool to help using SSH"
-  homepage "https://github.com/Feng-Zihao/okssh"
-  url "https://github.com/Feng-Zihao/okssh/archive/v1.1.0.zip"
-  version "1.1.0"
-  sha256 "422a6196679d5cb4809a53ead3ff5a52acf690f0f4f91549c43478b9f4c33eb8"
+  desc ""
+  homepage ""
+  url "https://github.com/Feng-Zihao/okssh/archive/v1.1.1.zip"
+  version "1.1.1"
+  sha256 "dc9482a4e091c81319fbf72d20e811986a07fa9e5edf27298189b9b64ad8276d"
 
   depends_on "cmake" => :build
   depends_on "pkgconfig"
   depends_on "yaml-cpp"
-  #depends_on :x11 # if your formula requires any X11/XQuartz components
 
   def install
     # ENV.deparallelize  # if your formula fails when building in parallel
