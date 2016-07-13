@@ -1,0 +1,11 @@
+hosts:
+    -
+        description: example description
+        keyfile: /absolute/path/for/keyfile
+        target: user@hostname
+    -
+        description: example description with mosh and specific port
+        keyfile: /absolute/path/for/keyfile
+        target: user@hostname
+        client: mosh  # if you're using mosh
+        port: 2222

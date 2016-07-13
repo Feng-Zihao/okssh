@@ -14,9 +14,10 @@ hosts:
         keyfile: /absolute/path/for/keyfile
         target: user@hostname
     -
-        description: example description with port
+        description: example description with mosh and specific port
         keyfile: /absolute/path/for/keyfile
         target: user@hostname
+        client: mosh  # if you're using mosh
         port: 2222
 )B246A588";
 
@@ -131,6 +132,11 @@ void Window::load_config(string path) {
         host_sptr->description = (*host)["description"].as<string>();
         host_sptr->keyfile = (*host)["keyfile"].as<string>();
         host_sptr->target = (*host)["target"].as<string>();
+        if ((*host)["client"]) {
+            host_sptr->client = (*host)["client"].as<string>();
+        } else {
+            host_sptr->client = "ssh";
+        }
         if ((*host)["port"]) {
             host_sptr->port = (*host)["port"].as<string>();
         }
@@ -149,7 +155,10 @@ void Window::load_config(string path) {
 const string &Host::GetShellCommand() {
     if (cmd.empty()) {
         cmd.resize(1024);
-        cmd = "ssh -i " + keyfile + " " + target;
+        if (client.empty()) {
+            client = "ssh";
+        }
+        cmd = client + " -i " + keyfile + " " + target;
     }
     if (!port.empty()) {
         cmd += " -p " + port;

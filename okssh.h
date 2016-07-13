@@ -48,6 +48,7 @@ private:
     string keyfile;
     string cmd;
     string port;
+    string client; // ssh or mosh
 
 public:
     const string &GetShellCommand();
