@@ -11,15 +11,15 @@ INSTALL
 ---
 #### via curl
 
-``shell
+``
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/Feng-Zihao/okssh/install.sh)"
 ``
 
 #### via wget
 
-``shell
+``
 sh -c "$(wget https://raw.githubusercontent.com/Feng-Zihao/okssh/install.sh -O -)"
-`
+``
 
 Usage
 ---
