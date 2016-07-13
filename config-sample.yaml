@@ -1,11 +1,12 @@
 hosts:
     -
+        # ssh -i /absolute/path/for/keyfile -p 2222 user@hostname
         description: example description
         keyfile: /absolute/path/for/keyfile
         target: user@hostname
+        port: 2222
     -
+        # mosh user@hostname
         description: example description with mosh and specific port
-        keyfile: /absolute/path/for/keyfile
         target: user@hostname
         client: mosh  # if you're using mosh
-        port: 2222

@@ -20,10 +20,16 @@ Similar with `~/.ssh/config`, but more structural robust.
 ```
 hosts:
     -
+        # ssh -i /absolute/path/for/keyfile -p 2222 user@hostname
         description: example description
         keyfile: /absolute/path/for/keyfile
         target: user@hostname
-
+        port: 2222
+    -
+        # mosh user@hostname
+        description: example description with mosh and specific port
+        target: user@hostname
+        client: mosh
 ```
 
 

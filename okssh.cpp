@@ -10,15 +10,17 @@ static struct termios old_tio, new_tio;
 const string CONFIG_TEMPLATE = R"B246A588(
 hosts:
     -
+        # ssh -i /absolute/path/for/keyfile -p 2222 user@hostname
         description: example description
         keyfile: /absolute/path/for/keyfile
         target: user@hostname
+        port: 2222
     -
+        # mosh user@hostname
         description: example description with mosh and specific port
-        keyfile: /absolute/path/for/keyfile
         target: user@hostname
         client: mosh  # if you're using mosh
-        port: 2222
+
 )B246A588";
 
 namespace okssh {
@@ -130,8 +132,10 @@ void Window::load_config(string path) {
         shared_ptr<Host> host_sptr = make_shared<Host>();
         host_sptr->description = "abc";
         host_sptr->description = (*host)["description"].as<string>();
-        host_sptr->keyfile = (*host)["keyfile"].as<string>();
         host_sptr->target = (*host)["target"].as<string>();
+        if ((*host)["keyfile"]) {
+            host_sptr->keyfile = (*host)["keyfile"].as<string>();
+        }
         if ((*host)["client"]) {
             host_sptr->client = (*host)["client"].as<string>();
         } else {
@@ -158,11 +162,16 @@ const string &Host::GetShellCommand() {
         if (client.empty()) {
             client = "ssh";
         }
-        cmd = client + " -i " + keyfile + " " + target;
+        cmd = client;
+        if (!keyfile.empty()) {
+            cmd += (" -i " + keyfile);
+        }
+        if (!port.empty()) {
+            cmd += " -p " + port;
+        }
+        cmd += (" " + target);
     }
-    if (!port.empty()) {
-        cmd += " -p " + port;
-    }
+
     return cmd;
 }
 
