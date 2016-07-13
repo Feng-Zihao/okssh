@@ -7,6 +7,20 @@ Gif record
 ---
 ![screenrecord](https://raw.githubusercontent.com/Feng-Zihao/okssh/master/screenrecord.gif)
 
+INSTALL
+---
+#### via curl
+
+``shell
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/Feng-Zihao/okssh/install.sh)"
+``
+
+#### via wget
+
+``shell
+sh -c "$(wget https://raw.githubusercontent.com/Feng-Zihao/okssh/install.sh -O -)"
+```
+
 Usage
 ---
 `okssh` and you'll find out how.
