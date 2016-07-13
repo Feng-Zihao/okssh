@@ -19,7 +19,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/Feng-Zihao/okssh/install.s
 
 ``shell
 sh -c "$(wget https://raw.githubusercontent.com/Feng-Zihao/okssh/install.sh -O -)"
-```
+`
 
 Usage
 ---
