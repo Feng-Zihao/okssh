@@ -23,7 +23,6 @@ int main() {
 
     signal (SIGINT, cleanup);
 
-
     do {
         keycode = getKeyDown();
         switch (keycode) {
@@ -42,6 +41,7 @@ int main() {
 
     window.SelectNone();
     restoreKeyboard();
+
 
 
     return 0;

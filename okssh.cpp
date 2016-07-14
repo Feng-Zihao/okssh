@@ -69,18 +69,13 @@ void Window::ResetCursor() {
 
 
 void Window::SelectPreviousItem() {
-    if (curr_item_idx > 0) {
-        curr_item_idx--;
-    }
+    curr_item_idx = (curr_item_idx - 1) % item_refs.size();
     ResetCursor();
     render();
 }
 
 void Window::SelectNextItem() {
-    curr_item_idx++;
-    if (curr_item_idx == item_refs.size()) {
-        curr_item_idx = (int32_t) (item_refs.size() - 1);
-    }
+    curr_item_idx = (curr_item_idx + 1) % item_refs.size();
     ResetCursor();
     render();
 }
@@ -96,6 +91,12 @@ shared_ptr<Item> Window::GetSelectedItemPtr() {
 }
 
 void Window::render() {
+    if (item_refs.empty()) {
+        printf("no item");
+        SelectNone();
+        restoreKeyboard();
+        exit(EXIT_FAILURE);
+    }
     for (int i = 0; i < item_refs.size(); ++i) {
         RenderItem(i == curr_item_idx, to_string(i) + " " + item_refs[i]->getDescription());
     }
